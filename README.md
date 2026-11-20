@@ -8,19 +8,26 @@ motion that most of them will back.
 
 ## How to play
 
-1. Open the post in the feed. The splash shows today's session, the community
-   turnout and your streak.
-2. Tap **Take the chair** to expand the game. Six neighbors stand around the
-   empty lot, each in a speech bubble explaining what they want (gardens, a
-   play court, bike racks, a levy, quiet after dark…).
+1. Open the post in the feed. The splash shows the 3D neighborhood live, the
+   six neighbors waiting with "…" speech bubbles, today's session, the
+   community turnout and your streak.
+2. Tap **Take the chair** to expand the game. The six neighbors stand around
+   the empty lot, each in a speech bubble explaining what they want (gardens,
+   a play court, bike racks, a levy, quiet after dark…).
 3. Pick one of three motions — **A** community garden, **B** play court &
    racks, **C** shared lot. Choosing a motion builds it in orange on the lot.
 4. **Call the vote.** Your motion is scored by how many of the six neighbors
    support it (x/6). The winner is decided by the daily seed and is unique:
    the best possible score is 4/6 or 3/6, never 6/6.
-5. The end card shows who backed you (arms raised in the scene), the best
-   motion of the day, the community split, your streak, your best streak and a
-   one-tap comment hook ("Ruth said no. Make your case.").
+5. The end card reads in the scene: every neighbor wears a Yes/No tag with
+   their reason, the ones who backed you raise an arm, the others turn their
+   back. The score sticker shows your x/6, the best motion of the day and the
+   community split; the footer names a dissenting neighbor ("Ruth said no.
+   Make your case.") and counts down to the next session.
+6. Tap the streak badge to open **The regulars**, your council record: how
+   often each neighbor backed you over the last seven sessions, your streak,
+   record and average, the neighborhood average, and the last seven sessions
+   with their scores.
 
 ## Daily loop
 
@@ -36,7 +43,9 @@ motion that most of them will back.
 ## Reddit-y layer
 
 - Streaks and a personal best, stored server-side in Redis.
-- The last seven sessions as a win/loss strip.
+- The last seven sessions as a win/loss strip, and the full record page
+  ("The regulars"): how often each neighbor backed you, your average score
+  next to the neighborhood's.
 - The community split of today's vote, with your choice highlighted.
 - A comment hook that names a dissenting neighbor.
 
@@ -44,12 +53,16 @@ motion that most of them will back.
 
 - **Client**: React 19 + Vite, hand-written CSS (cream/ink/orange "Quartier 3D"
   style), embedded Three.js 0.170.0 (MIT) rendering a claymation 3D scene with
-  toon shading and ink outlines. No network requests from the client.
+  toon shading and ink outlines. No external network request: the only calls
+  are same-origin `/api/init`, `/api/submit` and `/api/record`.
 - **Server**: Hono on Devvit Web (`@devvit/web/server`), Redis for streaks,
   per-day results, history, best and community tallies. The server never sends
   the winner or the support map before the player has voted.
-- **Shared**: deterministic daily generator (`src/shared/game.ts`) and the
-  vote/streak rules (`src/shared/vote.ts`), imported by both sides.
+- **Shared**: deterministic daily generator (`src/shared/game.ts`), the
+  vote/streak rules (`src/shared/vote.ts`) and the record layer
+  (`src/shared/record.ts`), imported by both sides.
+- **Entry points**: `splash.html` (inline post), `game.html` (expanded game)
+  and `series.html` (expanded council record).
 - Fonts: Archivo (variable, OFL) and DM Mono (OFL), embedded locally.
 
 ## Development

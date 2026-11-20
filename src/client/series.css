@@ -1,0 +1,71 @@
+/* Séries & quartier (planches v4/04-series). */
+.series .title {
+  left: 28px;
+  right: auto;
+  text-align: left;
+  top: 40px;
+  font-size: 46px;
+}
+.series .rule {
+  left: 30px;
+  right: auto;
+  text-align: left;
+  top: 94px;
+  max-width: 420px;
+}
+.series .yn b {
+  margin: 0;
+  padding: 3px 7px;
+}
+.streak-stk {
+  left: 28px;
+  bottom: 24px;
+  width: 236px;
+  padding: 16px 18px;
+  transform: rotate(-1deg);
+}
+.streak-stk .sub {
+  font-size: 12.5px;
+  margin-top: 6px;
+}
+.streak-stk .sub + .sub {
+  margin-top: 2px;
+}
+.days-stk {
+  right: 26px;
+  bottom: 24px;
+  width: 418px;
+  padding: 14px 18px 10px;
+  transform: rotate(0.6deg);
+}
+.srow {
+  display: grid;
+  grid-template-columns: 96px 1fr 92px;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+.srow .k {
+  opacity: 0.6;
+}
+.srow .topic {
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.srow .pips {
+  display: flex;
+  gap: 3px;
+  justify-content: flex-end;
+  margin: 0;
+}
+.srow .pips i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  margin: 0;
+  background: transparent;
+  box-shadow: 0 0 0 1.3px var(--ink);
+}
