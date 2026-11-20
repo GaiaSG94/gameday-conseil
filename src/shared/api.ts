@@ -1,4 +1,5 @@
 import type { Motion, Neighbor, Opinion } from './game';
+import type { CouncilRecord } from './record';
 import type { Result } from './vote';
 
 export type ErrorResponse = {
@@ -33,4 +34,12 @@ export type SubmitResponse = {
   history: number[];
   best: number;
   community: number[];
+};
+
+export type RecordResponse = CouncilRecord & {
+  type: 'record';
+  day: string;
+  session: number;
+  streak: number;
+  best: number;
 };
