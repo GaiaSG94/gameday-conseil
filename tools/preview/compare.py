@@ -218,7 +218,13 @@ def main() -> int:
             }
         nav.close()
     (out / "ecarts.json").write_text(
-        json.dumps(rapport, ensure_ascii=False, indent=1), encoding="utf-8"
+        "\n".join(
+            json.dumps(ligne, ensure_ascii=False)
+            for data in rapport.values()
+            for ligne in data["paires"]
+        )
+        + "\n",
+        encoding="utf-8",
     )
     for slug, data in rapport.items():
         print(f"\n== {slug} ==")
