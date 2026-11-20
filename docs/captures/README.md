@@ -10,7 +10,7 @@ verrouillée `G-DESIGN/planches/v4/`, à droite l'écran réel du produit
 | `02-post-cote-a-cote.png` | Post (inline) |
 | `03-carte-de-fin-cote-a-cote.png` | Carte de fin |
 | `04-series-cote-a-cote.png` | Séries & quartier |
-| `ecarts.json` | écarts mesurés (position, taille) de chaque élément clé |
+| `ecarts.json` | écarts mesurés (position, taille) de chaque élément clé, une ligne par élément |
 
 ## Reproduire
 
