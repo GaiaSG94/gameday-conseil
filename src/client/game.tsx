@@ -1,150 +1,20 @@
-import './index.css';
+import './base.css';
+import './game.css';
 
-import { context, navigateTo } from '@devvit/web/client';
+import { requestExpandedMode } from '@devvit/web/client';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import type { InitResponse, SubmitResponse } from '../shared/api';
-import type { Result } from '../shared/vote';
-import { letterOf, mountScene } from './scene';
+import { EndCard } from './endcard';
+import { dateLabel } from './format';
+import { mountScene } from './scene';
 import type { SceneHandle } from './scene';
+import { Cursor, Handles } from './stickers';
 
-const dateLabel = (day: string): string =>
-  new Date(day + 'T00:00:00Z').toLocaleDateString('en-US', {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-    timeZone: 'UTC',
-  });
+const RESULT_VIEW = { cam: [12.6, 9.2] as [number, number], target: [1.75, 0.15, -0.2] as [number, number, number] };
 
-const countdown = (nextAt: number, now: number): string => {
-  if (!now) return '';
-  const ms = Math.max(0, nextAt - now);
-  const h = Math.floor(ms / 3600000);
-  const m = Math.floor((ms % 3600000) / 60000);
-  return `Next session in ${h} h ${String(m).padStart(2, '0')} min`;
-};
-
-const indexOf = (ids: string[], id: string): number => ids.indexOf(id);
-
-const CommunityBar = ({
-  community,
-  choice,
-}: {
-  community: number[];
-  choice: number | null;
-}) => {
-  const total = community.reduce((a, b) => a + b, 0);
-  if (total === 0) return <p className="note">No votes yet today. Yours would be first.</p>;
-  return (
-    <div>
-      <div className="bar">
-        {community.map((count, i) =>
-          count > 0 ? (
-            <span
-              key={i}
-              className={i === choice ? 'mine' : 'other'}
-              style={{ width: `${Math.round((count / total) * 100)}%` }}
-            />
-          ) : null
-        )}
-      </div>
-      <p className="note">
-        {community
-          .map((count, i) => `${letterOf(i)} ${Math.round((count / total) * 100)}%`)
-          .join(' · ')}{' '}
-        — {total} {total === 1 ? 'vote' : 'votes'}
-      </p>
-    </div>
-  );
-};
-
-const EndCard = ({
-  init,
-  result,
-  backers,
-  community,
-  history,
-  best,
-}: {
-  init: InitResponse;
-  result: Result;
-  backers: string[];
-  community: number[];
-  history: number[];
-  best: number;
-}) => {
-  const [now, setNow] = useState(0);
-  useEffect(() => {
-    setNow(Date.now());
-    const timer = setInterval(() => setNow(Date.now()), 30000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const dissenter = init.neighbors.find((n) => !backers.includes(n.id));
-  const winnerMotion = init.motions[result.winner];
-
-  return (
-    <div className="panel">
-      <p className="hero">
-        {result.score}
-        <small>/6</small>
-      </p>
-      <p className="lede">
-        {result.won ? 'The council agreed with you.' : 'The council went another way.'}{' '}
-        You tabled {letterOf(result.choice)} ·{' '}
-        {init.motions[result.choice]?.title ?? ''}.
-      </p>
-      <p className="section-title">who backed you</p>
-      <div className="split">
-        {init.neighbors.map((neighbor) => (
-          <span key={neighbor.id} className={`pill${backers.includes(neighbor.id) ? '' : ' no'}`}>
-            <i style={{ background: neighbor.tint }} />
-            {neighbor.name}
-          </span>
-        ))}
-      </div>
-      {!result.won && winnerMotion && (
-        <p className="note">
-          Best motion today: {letterOf(result.winner)} · {winnerMotion.title}, backed by{' '}
-          {result.supporters.length}/6.
-        </p>
-      )}
-      <p className="section-title">streak</p>
-      <p className="lede">
-        {result.streak > 0 ? `${result.streak}-day streak` : 'Streak broken.'} · best {best}.
-      </p>
-      <div className="grid7" style={{ maxWidth: 280 }}>
-        {history.length === 0 ? <div>-</div> : null}
-        {history.map((won, i) => (
-          <div key={i} className={won ? 'win' : 'loss'}>
-            {won ? 'W' : 'L'}
-          </div>
-        ))}
-      </div>
-      <p className="section-title">what the neighborhood tabled</p>
-      <CommunityBar community={community} choice={result.choice} />
-      <div className="comment">
-        <p style={{ fontWeight: 800, fontSize: 15 }}>
-          {dissenter ? `${dissenter.name} said no. Make your case.` : 'Unanimous. Say thank you.'}
-        </p>
-        <span className="mono" style={{ fontSize: 10.5 }}>
-          {countdown(init.nextAt, now)}
-        </span>
-        <button
-          className="cta"
-          onClick={() => {
-            if (context.postId) navigateTo(`https://reddit.com/comments/${context.postId}`);
-          }}
-        >
-          Comment
-        </button>
-      </div>
-    </div>
-  );
-};
-
-const Game = () => {
+export const Game = () => {
   const [init, setInit] = useState<InitResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [choice, setChoice] = useState<number | null>(null);
@@ -183,6 +53,7 @@ const Game = () => {
         yes: init.backers,
       });
       sceneRef.current = handle;
+      if (init.result) handle.setView(RESULT_VIEW);
     } catch {
       /* WebGL unavailable: the .nogl message stays visible */
     }
@@ -207,6 +78,7 @@ const Game = () => {
       setSub(response);
       sceneRef.current?.setChoice(response.result.choice);
       sceneRef.current?.setYes(response.backers);
+      sceneRef.current?.setView(RESULT_VIEW);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'submit failed');
     } finally {
@@ -231,7 +103,10 @@ const Game = () => {
 
   const result = sub?.result ?? init.result;
   const voted = Boolean(result);
-  const backersShown = sub ? sub.backers : (init.backers ?? []);
+  const backers = sub ? sub.backers : (init.backers ?? []);
+  const community = sub ? sub.community : init.community;
+  const neighbors = init.neighbors;
+  const opinions = init.opinions;
 
   return (
     <div className="app">
@@ -245,42 +120,47 @@ const Game = () => {
             <span>
               Session {init.session} · {dateLabel(init.day)}
             </span>
-            <span>
-              <b>
-                {(result ?? { streak: init.streak }).streak}-day streak
-              </b>
-            </span>
+            <button
+              className="meta-btn"
+              onClick={(e) => requestExpandedMode(e.nativeEvent, 'series')}
+              title="Your record"
+            >
+              <b>{(result ?? { streak: init.streak }).streak}-day streak</b>
+            </button>
           </div>
-          <h1 className="title">
-            Tonight: <span className="sel">the empty lot</span>
-          </h1>
-          <p className="rule">
-            Six neighbors, one lot.{' '}
-            <b>Pick the motion most of them will back.</b>
-          </p>
-          <span className="tag">The lot, today</span>
-          {init.opinions.map((opinion) => {
-            const i = indexOf(
-              init.neighbors.map((n) => n.id),
-              opinion.id
-            );
-            const yes = voted && backersShown.includes(opinion.id);
-            return (
-              <p
-                key={opinion.id}
-                data-i={i}
-                className={`bub ${i < 3 ? 'l' : 'r'}${yes ? ' yes' : ''}`}
-              >
-                {opinion.text}
-                <em>
-                  <i style={{ background: opinion.tint }} />
-                  {opinion.name} · {opinion.role}
-                </em>
-              </p>
-            );
-          })}
-          {!voted && (
+          {voted ? (
+            <EndCard init={init} result={result!} backers={backers} community={community} />
+          ) : (
             <>
+              <h1 className="title">
+                Tonight:{' '}
+                <span className="sel">
+                  the empty lot
+                  <Handles />
+                </span>
+              </h1>
+              <p className="rule">
+                Six neighbors, one lot.{' '}
+                <b>Pick the motion most of them will back.</b>
+              </p>
+              <span className="tag">The lot, today</span>
+              {opinions.map((opinion) => {
+                const i = neighbors.findIndex((neighbor) => neighbor.id === opinion.id);
+                return (
+                  <p
+                    key={opinion.id}
+                    data-i={i}
+                    data-side={i < 3 ? 'l' : 'r'}
+                    className={`bub ${i < 3 ? 'l' : 'r'}`}
+                  >
+                    {opinion.text}
+                    <em>
+                      <i style={{ background: opinion.tint }} />
+                      {opinion.name} · {opinion.role}
+                    </em>
+                  </p>
+                );
+              })}
               <div className="motions">
                 {init.motions.map((motion, i) => (
                   <button
@@ -300,13 +180,13 @@ const Game = () => {
                       <s />
                       <s />
                     </span>
+                    <Cursor />
                   </button>
                 ))}
               </div>
               <div className="foot">
                 <p>
-                  {init.community[0]! + init.community[1]! + init.community[2]!}{' '}
-                  neighbors have voted today
+                  {community[0]! + community[1]! + community[2]!} neighbors have voted today
                 </p>
                 <button
                   className="cta"
@@ -320,26 +200,6 @@ const Game = () => {
           )}
         </div>
       </div>
-      {result && sub && (
-        <EndCard
-          init={init}
-          result={sub.result}
-          backers={sub.backers}
-          community={sub.community}
-          history={sub.history}
-          best={sub.best}
-        />
-      )}
-      {result && !sub && (
-        <EndCard
-          init={init}
-          result={init.result!}
-          backers={init.backers ?? []}
-          community={init.community}
-          history={init.history}
-          best={init.best}
-        />
-      )}
     </div>
   );
 };

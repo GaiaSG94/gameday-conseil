@@ -10,6 +10,9 @@
       },
       "game": {
         "entry": "game.html"
+      },
+      "series": {
+        "entry": "series.html"
       }
     }
   },

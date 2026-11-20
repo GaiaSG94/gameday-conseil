@@ -1,0 +1,181 @@
+/* Game screen (planches v4/01-quartier-3d + 03 overlays). */
+.bub {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 176px;
+  background: var(--white);
+  border-radius: 14px;
+  padding: 8px 11px;
+  font-size: 13px;
+  line-height: 1.24;
+  font-weight: 550;
+  box-shadow: 0 0 0 1.6px var(--ink), 0 3px 0 1.6px var(--ink);
+  will-change: transform;
+}
+.bub::after {
+  content: '';
+  position: absolute;
+  top: 16px;
+  width: 11px;
+  height: 11px;
+  background: var(--white);
+  box-shadow: 1.6px 1.6px 0 0 var(--ink);
+}
+.bub.l::after {
+  right: -6px;
+  transform: rotate(-45deg);
+}
+.bub.r::after {
+  left: -6px;
+  transform: rotate(135deg);
+}
+.bub em {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font: 500 9.5px/1 'DM Mono', monospace;
+  font-style: normal;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.62;
+  margin-top: 5px;
+}
+.bub em i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1.5px var(--white), 0 0 0 2.5px rgba(0, 0, 0, 0.25);
+}
+.bub.yes {
+  box-shadow: 0 0 0 2px var(--ink), 0 3px 0 2px var(--orange);
+}
+
+.motions {
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  bottom: 12.5%;
+  display: flex;
+  gap: 16px;
+}
+.motion {
+  position: relative;
+  flex: 1;
+  cursor: pointer;
+  text-align: left;
+  background: var(--white);
+  border-radius: 999px;
+  padding: 11px 16px 11px 54px;
+  box-shadow: 0 0 0 5px var(--white), 0 3px 8px rgba(0, 0, 0, 0.18);
+  transition: transform 0.15s;
+}
+.motion:nth-child(1) {
+  transform: rotate(-1.5deg);
+}
+.motion:nth-child(2) {
+  transform: rotate(1deg);
+}
+.motion:nth-child(3) {
+  transform: rotate(-0.6deg);
+}
+.motion:hover:not(:disabled) {
+  transform: rotate(0) translateY(-2px);
+}
+.motion i {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  margin-top: -16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--cream);
+  font-style: normal;
+  font-weight: 900;
+  font-size: 16px;
+  display: grid;
+  place-items: center;
+}
+.motion b {
+  display: block;
+  font-weight: 850;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+.motion span {
+  display: block;
+  font-size: 11.5px;
+  line-height: 1.25;
+  margin-top: 2px;
+}
+.motion.chosen {
+  transform: rotate(0) scale(1.04);
+  z-index: 2;
+}
+.motion.chosen i {
+  background: var(--orange);
+  color: var(--white);
+}
+.motion .frame {
+  position: absolute;
+  inset: -12px -10px;
+  border: 1.5px solid var(--orange);
+  border-radius: 4px;
+  display: none;
+}
+.motion .frame s {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: var(--white);
+  border: 1.5px solid var(--orange);
+  display: block;
+}
+.motion .frame s:nth-child(1) {
+  left: -5px;
+  top: -5px;
+}
+.motion .frame s:nth-child(2) {
+  right: -5px;
+  top: -5px;
+}
+.motion .frame s:nth-child(3) {
+  left: -5px;
+  bottom: -5px;
+}
+.motion .frame s:nth-child(4) {
+  right: -5px;
+  bottom: -5px;
+}
+.motion.chosen .frame {
+  display: block;
+}
+.motion .cur {
+  position: absolute;
+  right: -16px;
+  bottom: -22px;
+  opacity: 0;
+  pointer-events: none;
+}
+.motion.chosen .cur {
+  opacity: 1;
+}
+
+.foot {
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  bottom: 2.8%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.foot p {
+  font: 500 10.5px/1.3 'DM Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
